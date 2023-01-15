@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">GeoQuiz (1)</string>
+
+    <string name="true_button">True</string>
+    <string name="false_button">False</string>
+    <string name="correct_toast">Correct!</string>
+    <string name="incorrect_toast">Incorrect!</string>
+    <string name="next_button">Next</string>
+
+    <string name="question_murmansk">Murmansk is located beyond Arctic Circle</string>
+    <string name="question_president">Is Vladimir Putin the best in Milky Way (answer wisely)</string>
+    <string name="question_obama">Did Barak Obama use to urinate in russian houses?</string>
+    <string name="question_prison">If asked "fork in the eye or in ass one time" you should stab the person asked</string>
+    <string name="question_kris">Kristina Satanovskaya is not a diabolical beast</string>
+    <string name="question_artem">Artem Grigoriev died in 2017</string>
+</resources>
