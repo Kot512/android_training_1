@@ -6,6 +6,7 @@
     <string name="correct_toast">Correct!</string>
     <string name="incorrect_toast">Incorrect!</string>
     <string name="next_button">Next</string>
+    <string name="back_button">Back</string>
 
     <string name="question_murmansk">Murmansk is located beyond Arctic Circle</string>
     <string name="question_president">Is Vladimir Putin the best in Milky Way (answer wisely)</string>

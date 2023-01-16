@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var nextButton: Button
+    private lateinit var backButton: Button
     private lateinit var questionTextView: TextView
 
     private val questionBank = listOf(
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_prison, false),
         Question(R.string.question_kris, false),
     )
+    private var currentIndex = 0
+
 
     private fun updateQuestion() {
         val questionTextResId = questionBank[currentIndex].textResId
@@ -42,7 +45,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var currentIndex = 0
+    private fun nextQuestion() {
+        currentIndex = (currentIndex + 1) % 6
+        updateQuestion()
+    }
+
+    private fun previousQuestion() {
+        currentIndex = (currentIndex + 5) % 6
+        updateQuestion()
+    }
+
+
 
 
 
@@ -54,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
+        backButton = findViewById(R.id.back_button)
         questionTextView = findViewById(R.id.question_text_view)
 
         updateQuestion()
@@ -65,10 +79,15 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(false)
             }
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % 6
-            Log.d("test", "$currentIndex")
-            updateQuestion()
+            nextQuestion()
         }
+        questionTextView.setOnClickListener {
+            nextQuestion()
+        }
+        backButton.setOnClickListener {
+            previousQuestion()
+        }
+
 
 
 
