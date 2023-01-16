@@ -1,6 +1,7 @@
 package com.example.geoquiz
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.widget.Button
 import android.widget.TextView
@@ -64,7 +65,8 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(false)
             }
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % 7
+            currentIndex = (currentIndex + 1) % 6
+            Log.d("test", "$currentIndex")
             updateQuestion()
         }
 
