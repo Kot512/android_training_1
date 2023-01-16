@@ -1,6 +1,7 @@
 package com.example.geoquiz
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.widget.Button
 import android.widget.ImageButton
@@ -8,12 +9,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
+private const val TAG = "MainActivity"
+
+
 class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var nextButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var questionTextView: TextView
+
+
+
 
     private val questionBank = listOf(
         Question(R.string.question_murmansk, true),
@@ -24,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_kris, false),
     )
     private var currentIndex = 0
+
+
 
 
     private fun updateQuestion() {
@@ -57,8 +66,10 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate(Bundle?)")
         setContentView(R.layout.activity_main)
 
         trueButton = findViewById(R.id.true_button)
@@ -84,9 +95,31 @@ class MainActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             previousQuestion()
         }
-
-
-
-
     }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume()")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy()")
+    }
+
 }
