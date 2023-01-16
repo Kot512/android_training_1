@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var questionTextView: TextView
+    private lateinit var resultBarTextView: TextView
+    private lateinit var retryButton: Button
 
 
 
@@ -31,19 +34,31 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_kris, false),
     )
     private var currentIndex = 0
+    private var score = 0
+    private var answeredCount = 0
 
 
 
 
     private fun updateQuestion() {
+        Log.d(TAG, "${questionBank[currentIndex].isAnswered}")
         val questionTextResId = questionBank[currentIndex].textResId
         questionTextView.setText(questionTextResId)
+
+        if (!questionBank[currentIndex].isAnswered) {
+            trueButton.isEnabled = true
+            falseButton.isEnabled = true
+        } else {
+            trueButton.isEnabled = false
+            falseButton.isEnabled = false
+        }
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
         val messageResId = if (correctAnswer == userAnswer)
-            R.string.correct_toast else R.string.incorrect_toast
+            R.string.correct_toast.also { score += 1 }
+            else R.string.incorrect_toast
         Toast.makeText(
             this,
             messageResId,
@@ -52,6 +67,17 @@ class MainActivity : AppCompatActivity() {
             setGravity(Gravity.TOP, 0, 500)
             show()
         }
+
+        trueButton.isEnabled = false
+        falseButton.isEnabled = false
+        questionBank[currentIndex].isAnswered = true
+        answeredCount += 1
+
+        if (answeredCount == questionBank.size) {
+            showResult()
+        }
+
+        Log.d(TAG, "$score")
     }
 
     private fun nextQuestion() {
@@ -61,6 +87,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun previousQuestion() {
         currentIndex = (currentIndex + questionBank.size - 1) % questionBank.size
+        updateQuestion()
+    }
+
+    private fun showResult() {
+        val scoreText = "Your score is ${100.0 * score / questionBank.size}%"
+        resultBarTextView.text = scoreText
+        resultBarTextView.visibility = View.VISIBLE
+        retryButton.visibility = View.VISIBLE
+    }
+
+    private fun hideResultAndRestart() {
+        resultBarTextView.visibility = View.GONE
+        retryButton.visibility = View.GONE
+        answeredCount = 0
+        score = 0
+        currentIndex = 0
+        questionBank.forEach { it.isAnswered = false }
         updateQuestion()
     }
 
@@ -77,6 +120,8 @@ class MainActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.next_button)
         backButton = findViewById(R.id.back_button)
         questionTextView = findViewById(R.id.question_text_view)
+        retryButton = findViewById(R.id.retry_button)
+        resultBarTextView = findViewById(R.id.result_bar)
 
         updateQuestion()
 
@@ -94,6 +139,9 @@ class MainActivity : AppCompatActivity() {
         }
         backButton.setOnClickListener {
             previousQuestion()
+        }
+        retryButton.setOnClickListener {
+            hideResultAndRestart()
         }
     }
 

@@ -7,9 +7,19 @@
         android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="24dp"
         android:layout_gravity="center_horizontal"
-        tools:text="@string/question_murmansk"
+        android:padding="24dp"
+        tools:text="@string/question_murmansk" />
+
+    <TextView
+        android:id="@+id/result_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="your score is 0"
         />
 
 
@@ -56,4 +66,14 @@
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/retry_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/retry_button"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
 </FrameLayout>
