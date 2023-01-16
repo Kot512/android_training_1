@@ -1,15 +1,12 @@
 package com.example.geoquiz
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
-private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
@@ -59,9 +56,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "OnCreate(Bundle?)")
         setContentView(R.layout.activity_main)
 
         trueButton = findViewById(R.id.true_button)
@@ -70,11 +67,7 @@ class MainActivity : AppCompatActivity() {
         backButton = findViewById(R.id.back_button)
         questionTextView = findViewById(R.id.question_text_view)
 
-
-
         updateQuestion()
-
-
 
         trueButton.setOnClickListener {
             checkAnswer(true)
@@ -91,30 +84,9 @@ class MainActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             previousQuestion()
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "OnStart()")
-    }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "OnResume()")
-    }
 
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "OnPause()")
-    }
 
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "OnStop()")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "OnDestroy()")
     }
 }
