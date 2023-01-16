@@ -47,18 +47,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun nextQuestion() {
         currentIndex = (currentIndex + 1) % questionBank.size
-//        currentIndex = (currentIndex + 1) % 6
         updateQuestion()
     }
 
     private fun previousQuestion() {
         currentIndex = (currentIndex + questionBank.size - 1) % questionBank.size
-//        currentIndex = (currentIndex + 5) % 6
         updateQuestion()
     }
-
-
-
 
 
 
