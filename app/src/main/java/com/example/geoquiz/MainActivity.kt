@@ -9,6 +9,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 
@@ -22,30 +25,43 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultBarTextView: TextView
     private lateinit var retryButton: Button
 
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+    }
 
 
 
-    private val questionBank = listOf(
-        Question(R.string.question_murmansk, true),
-        Question(R.string.question_president, true),
-        Question(R.string.question_artem, true),
-        Question(R.string.question_obama, true),
-        Question(R.string.question_prison, false),
-        Question(R.string.question_kris, false),
-    )
-    private var currentIndex = 0
-    private var score = 0
-    private var answeredCount = 0
 
+    private fun checkAnswer(userAnswer: Boolean) {
+        val correctAnswer = quizViewModel.currentQuestionAnswer
+        val messageResId =
+            if (correctAnswer == userAnswer)
+            R.string.correct_toast.also { quizViewModel.score++ }
+            else R.string.incorrect_toast
 
+        Toast.makeText(
+            this, messageResId, Toast.LENGTH_SHORT
+        ).apply {
+            setGravity(Gravity.TOP, 0, 500)
+            show()
+        }
 
+        trueButton.isEnabled = false
+        falseButton.isEnabled = false
+        quizViewModel.currentQuestionAnswered = true
+        quizViewModel.answeredCount++
+
+        if (quizViewModel.answeredCount == quizViewModel.questionsAmount) {
+            showResult()
+        }
+    }
 
     private fun updateQuestion() {
-        Log.d(TAG, "${questionBank[currentIndex].isAnswered}")
-        val questionTextResId = questionBank[currentIndex].textResId
+        Log.d(TAG, "${quizViewModel.currentQuestionText}, ${quizViewModel.questionBank[quizViewModel.currentIndex]}")
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
 
-        if (!questionBank[currentIndex].isAnswered) {
+        if (!quizViewModel.currentQuestionAnswered) {
             trueButton.isEnabled = true
             falseButton.isEnabled = true
         } else {
@@ -54,58 +70,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
-        val messageResId = if (correctAnswer == userAnswer)
-            R.string.correct_toast.also { score += 1 }
-            else R.string.incorrect_toast
-        Toast.makeText(
-            this,
-            messageResId,
-            Toast.LENGTH_SHORT
-        ).apply {
-            setGravity(Gravity.TOP, 0, 500)
-            show()
-        }
-
-        trueButton.isEnabled = false
-        falseButton.isEnabled = false
-        questionBank[currentIndex].isAnswered = true
-        answeredCount += 1
-
-        if (answeredCount == questionBank.size) {
-            showResult()
-        }
-
-        Log.d(TAG, "$score")
-    }
-
     private fun nextQuestion() {
-        currentIndex = (currentIndex + 1) % questionBank.size
+        quizViewModel.indexPlus()
         updateQuestion()
+        Log.d(TAG, "${quizViewModel.currentIndex}")
     }
 
     private fun previousQuestion() {
-        currentIndex = (currentIndex + questionBank.size - 1) % questionBank.size
+        quizViewModel.indexMinus()
         updateQuestion()
     }
 
     private fun showResult() {
-        val scoreText = "Your score is ${100.0 * score / questionBank.size}%"
+        val scoreText = "Your score is ${100.0 * quizViewModel.score / quizViewModel.questionsAmount}%"
         resultBarTextView.text = scoreText
         resultBarTextView.visibility = View.VISIBLE
         retryButton.visibility = View.VISIBLE
+        quizViewModel.resultShown = true
     }
 
     private fun hideResultAndRestart() {
+        quizViewModel.resultShown = false
         resultBarTextView.visibility = View.GONE
         retryButton.visibility = View.GONE
-        answeredCount = 0
-        score = 0
-        currentIndex = 0
-        questionBank.forEach { it.isAnswered = false }
+        quizViewModel.answeredCount = 0
+        quizViewModel.score = 0
+        quizViewModel.currentIndex = 0
+        quizViewModel.resetQuestions()
         updateQuestion()
     }
+
+
+
+
 
 
 
@@ -113,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?)")
+
         setContentView(R.layout.activity_main)
 
         trueButton = findViewById(R.id.true_button)
@@ -124,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         resultBarTextView = findViewById(R.id.result_bar)
 
         updateQuestion()
+        if (quizViewModel.resultShown) showResult()
 
         trueButton.setOnClickListener {
             checkAnswer(true)

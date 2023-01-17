@@ -21,8 +21,9 @@
         android:padding="15dp"
         android:gravity="center"
         android:visibility="gone"
+        android:textColor="@color/blue"
         tools:visibility="visible"
-        tools:text="your score is 0"
+        tools:text="Your score is 0"
         />
 
 
