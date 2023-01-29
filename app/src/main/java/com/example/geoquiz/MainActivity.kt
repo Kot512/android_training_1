@@ -1,5 +1,6 @@
 package com.example.geoquiz
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -9,11 +10,11 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+//import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,15 +25,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var questionTextView: TextView
     private lateinit var resultBarTextView: TextView
     private lateinit var retryButton: Button
+    private lateinit var cheatButton: Button
 
     private val quizViewModel: QuizViewModel by lazy {
-        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+//        ViewModelProviders.of(this).get(QuizViewModel::class.java) - устаревшая форма записи
+        ViewModelProvider(this)[QuizViewModel::class.java]
+    }
+
+
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
 
 
 
     private fun checkAnswer(userAnswer: Boolean) {
+
         val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId =
             if (correctAnswer == userAnswer)
@@ -54,10 +66,11 @@ class MainActivity : AppCompatActivity() {
         if (quizViewModel.answeredCount == quizViewModel.questionsAmount) {
             showResult()
         }
+
     }
 
     private fun updateQuestion() {
-        Log.d(TAG, "${quizViewModel.currentQuestionText}, ${quizViewModel.questionBank[quizViewModel.currentIndex]}")
+
         val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
 
@@ -68,9 +81,11 @@ class MainActivity : AppCompatActivity() {
             trueButton.isEnabled = false
             falseButton.isEnabled = false
         }
+
     }
 
     private fun nextQuestion() {
+
         quizViewModel.indexPlus()
         updateQuestion()
         Log.d(TAG, "${quizViewModel.currentIndex}")
@@ -79,17 +94,21 @@ class MainActivity : AppCompatActivity() {
     private fun previousQuestion() {
         quizViewModel.indexMinus()
         updateQuestion()
+
     }
 
     private fun showResult() {
+
         val scoreText = "Your score is ${100.0 * quizViewModel.score / quizViewModel.questionsAmount}%"
         resultBarTextView.text = scoreText
         resultBarTextView.visibility = View.VISIBLE
         retryButton.visibility = View.VISIBLE
         quizViewModel.resultShown = true
+
     }
 
     private fun hideResultAndRestart() {
+
         quizViewModel.resultShown = false
         resultBarTextView.visibility = View.GONE
         retryButton.visibility = View.GONE
@@ -98,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         quizViewModel.currentIndex = 0
         quizViewModel.resetQuestions()
         updateQuestion()
+
     }
 
 
@@ -110,8 +130,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?)")
-
         setContentView(R.layout.activity_main)
+
+        quizViewModel.currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -120,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         questionTextView = findViewById(R.id.question_text_view)
         retryButton = findViewById(R.id.retry_button)
         resultBarTextView = findViewById(R.id.result_bar)
+        cheatButton = findViewById(R.id.cheat_button)
 
         updateQuestion()
         if (quizViewModel.resultShown) showResult()
@@ -141,6 +163,11 @@ class MainActivity : AppCompatActivity() {
         }
         retryButton.setOnClickListener {
             hideResultAndRestart()
+        }
+        cheatButton.setOnClickListener {
+            val intent = Intent(this, CheatActivity::class.java)
+            // this показывает, что запускаемую активити искать в этом пакете
+            startActivity(intent)
         }
     }
 
