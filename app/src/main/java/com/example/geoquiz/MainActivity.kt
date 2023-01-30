@@ -1,6 +1,5 @@
 package com.example.geoquiz
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,13 +10,14 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
-private const val REQUEST_CODE_CHEAT = 0
-
+//private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
@@ -34,24 +34,44 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this)[QuizViewModel::class.java]
     }
 
+    private val cheatResultLauncher = activityResultLauncher {
+        if (it.resultCode == RESULT_OK) {
+            val data = it.data
+            quizViewModel.currentQuestionCheated =
+                data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
+    }
 
-
+//    private val activityResultLauncher: ((ActivityResult) -> Unit) -> ActivityResultLauncher<Intent?>
+//            = { someFun ->
+//        registerForActivityResult(
+//            ActivityResultContracts.StartActivityForResult()
+//        ) { activityResult -> someFun(activityResult) }
+//    }
+    private fun activityResultLauncher(
+        someFun: (ActivityResult) -> Unit
+    ): ActivityResultLauncher<Intent?> {
+        return registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { activityResult -> someFun(activityResult) }
+    }
+    //    шаблон для принятия результата из других активити (в виде функции и переменной)
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK) return
-
-        if (requestCode == REQUEST_CODE_CHEAT)
-            quizViewModel.currentQuestionCheated =
-                data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
-    }
-
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (resultCode != Activity.RESULT_OK) return
+//
+//        if (requestCode == REQUEST_CODE_CHEAT)
+//            quizViewModel.currentQuestionCheated =
+//                data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+//    }
+//    устаревший вместе с startActivityForResult метод
 
 
 
@@ -162,6 +182,8 @@ class MainActivity : AppCompatActivity() {
         if (quizViewModel.resultShown) showResult()
 
 
+
+
         trueButton.setOnClickListener {
             checkAnswer(true)
         }
@@ -183,10 +205,15 @@ class MainActivity : AppCompatActivity() {
         cheatButton.setOnClickListener {
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this, answerIsTrue)
+
 //            startActivity(intent) просто создает новый активити, не ожидая получить данные из нее
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+
+//            startActivityForResult(intent, REQUEST_CODE_CHEAT) - устаревшая версия
 //            по REQUEST_CODE_CHEAT onActivityResult поймет, что будут приниматься данные
 //            именно из активити, запущенного именно с этого startActivityForResult
+
+
+            cheatResultLauncher.launch(intent)
         }
     }
 
