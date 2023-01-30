@@ -6,6 +6,7 @@ data class Question(
     @StringRes val textResId: Int,
     val answer: Boolean,
     var isAnswered: Boolean = false,
+    var isCheated: Boolean = false,
 )
 
 //аннотация @StringRes помогает встроенному инспектору кода Lint проверить во время компиляции,

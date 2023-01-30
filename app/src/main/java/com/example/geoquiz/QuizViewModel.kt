@@ -30,17 +30,25 @@ class QuizViewModel: ViewModel() {
     val currentQuestionText: Int
         get() = questionBank[currentIndex].textResId
 
-    var currentQuestionAnswered: Boolean = false
+    var currentQuestionAnswered: Boolean
         get() = questionBank[currentIndex].isAnswered
         set(value: Boolean) {
-            field = value
             questionBank[currentIndex].isAnswered = value
+        }
+
+    var currentQuestionCheated: Boolean
+        get() = questionBank[currentIndex].isCheated
+        set(value: Boolean) {
+            questionBank[currentIndex].isCheated = value
         }
 
     var resultShown = false
 
 
 
+
+
+    
     fun indexPlus() {
         currentIndex = (currentIndex + 1) % questionBank.size
     }
@@ -49,6 +57,12 @@ class QuizViewModel: ViewModel() {
     }
 
     fun resetQuestions() {
-        questionBank.forEach { it.isAnswered = false }
+        questionBank.forEach {
+            it.apply {
+                isAnswered = false
+                isCheated = false
+            }
+        }
+
     }
 }

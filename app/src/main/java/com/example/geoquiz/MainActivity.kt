@@ -1,5 +1,6 @@
 package com.example.geoquiz
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,12 +10,13 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-//import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
+private const val REQUEST_CODE_CHEAT = 0
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,16 +42,30 @@ class MainActivity : AppCompatActivity() {
         outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) return
+
+        if (requestCode == REQUEST_CODE_CHEAT)
+            quizViewModel.currentQuestionCheated =
+                data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+    }
+
+
 
 
 
     private fun checkAnswer(userAnswer: Boolean) {
-
         val correctAnswer = quizViewModel.currentQuestionAnswer
-        val messageResId =
-            if (correctAnswer == userAnswer)
-            R.string.correct_toast.also { quizViewModel.score++ }
-            else R.string.incorrect_toast
+        val messageResId = when {
+                quizViewModel.currentQuestionCheated -> R.string.judgement_toast
+
+                correctAnswer == userAnswer ->
+                    R.string.correct_toast.also { quizViewModel.score++ }
+
+                else -> R.string.incorrect_toast
+            }
 
         Toast.makeText(
             this, messageResId, Toast.LENGTH_SHORT
@@ -70,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-
         val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
 
@@ -85,7 +100,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nextQuestion() {
-
         quizViewModel.indexPlus()
         updateQuestion()
         Log.d(TAG, "${quizViewModel.currentIndex}")
@@ -98,7 +112,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showResult() {
-
         val scoreText = "Your score is ${100.0 * quizViewModel.score / quizViewModel.questionsAmount}%"
         resultBarTextView.text = scoreText
         resultBarTextView.visibility = View.VISIBLE
@@ -108,7 +121,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun hideResultAndRestart() {
-
         quizViewModel.resultShown = false
         resultBarTextView.visibility = View.GONE
         retryButton.visibility = View.GONE
@@ -119,6 +131,8 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
 
     }
+
+
 
 
 
@@ -143,8 +157,10 @@ class MainActivity : AppCompatActivity() {
         resultBarTextView = findViewById(R.id.result_bar)
         cheatButton = findViewById(R.id.cheat_button)
 
+
         updateQuestion()
         if (quizViewModel.resultShown) showResult()
+
 
         trueButton.setOnClickListener {
             checkAnswer(true)
@@ -165,9 +181,12 @@ class MainActivity : AppCompatActivity() {
             hideResultAndRestart()
         }
         cheatButton.setOnClickListener {
-            val intent = Intent(this, CheatActivity::class.java)
-            // this показывает, что запускаемую активити искать в этом пакете
-            startActivity(intent)
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this, answerIsTrue)
+//            startActivity(intent) просто создает новый активити, не ожидая получить данные из нее
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+//            по REQUEST_CODE_CHEAT onActivityResult поймет, что будут приниматься данные
+//            именно из активити, запущенного именно с этого startActivityForResult
         }
     }
 
