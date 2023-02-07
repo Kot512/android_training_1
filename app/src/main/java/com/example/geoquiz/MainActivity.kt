@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
-import org.w3c.dom.Text
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
@@ -62,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         ) { activityResult -> someFun(activityResult) }
     }
     //    шаблон для принятия результата из других активити (в виде функции и переменной)
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -173,13 +173,13 @@ class MainActivity : AppCompatActivity() {
         retryButton = findViewById(R.id.retry_button)
         resultBarTextView = findViewById(R.id.result_bar)
         cheatButton = findViewById(R.id.cheat_button)
-        apiTextView = findViewById<TextView?>(R.id.api_text_view)
+        apiTextView = findViewById(R.id.api_text_view)
 
 
         updateQuestion()
         if (quizViewModel.resultShown) showResult()
 
-        val apiLevel = "API level ${android.os.Build.VERSION.SDK_INT}"
+        val apiLevel = "API level ${Build.VERSION.SDK_INT}"
         apiTextView.text = apiLevel
 
         trueButton.setOnClickListener {
@@ -214,6 +214,7 @@ class MainActivity : AppCompatActivity() {
                     buttonView.height,
                 )
                 cheatResultLauncher.launch(intent, options) // запускаем созданный ActivityResult с доп. настройками
+//                (доп. настройки - ActivityOptionsCompat, поскольку ActivityOption не поддерживается методом)
             } else cheatResultLauncher.launch(intent) // запускаем без настроек
 //            настраиваем запуск активити и указываем, что CheatActivity должно иметь анимацию
 //            отображения из небольшой области View, указанной в параметре (в данном случае из кнопки)
